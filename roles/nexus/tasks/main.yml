@@ -114,23 +114,6 @@
             name: registry.connect.redhat.com/sonatype/nexus-repository-manager: "{{ nexusVersion }}"
           name: "{{ nexusVersion }}"
 
-- name: Create route
-  k8s:
-    definition:
-      apiVersion: route.openshift.io/v1
-      kind: Route
-      metadata:
-        labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}"
-      spec:
-        port:
-          targetPort: 8081-tcp
-        to:
-          kind: Service
-          name: "{{ metadata.name }}"
-          weight: 100
-
 - name: Create service
   k8s:
     definition:
@@ -150,3 +133,21 @@
           deploymentconfig: "{{ metadata.name }}"
         sessionAffinity: None
         type: ClusterIP
+
+- name: Create route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}"
+      spec:
+        port:
+          targetPort: 8081-tcp
+        to:
+          kind: Service
+          name: "{{ metadata.name }}"
+          weight: 100
+
