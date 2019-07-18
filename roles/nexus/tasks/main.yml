@@ -111,7 +111,7 @@
         tags:
         - from:
             kind: DockerImage
-            name: registry.connect.redhat.com/sonatype/nexus-repository-manager: "{{ nexusVersion }}"
+            name: "registry.connect.redhat.com/sonatype/nexus-repository-manager:{{ nexusVersion }}"
           name: "{{ nexusVersion }}"
 
 - name: Create service
