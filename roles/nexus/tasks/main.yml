@@ -1,0 +1,152 @@
+---
+# tasks file for nexus
+#
+- name: Provision Storage
+  k8s: 
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}-pv"
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ volumeCapacity }}"
+
+- name: Create deployment
+  k8s:
+    definition:
+      apiVersion: apps.openshift.io/v1
+      kind: DeploymentConfig
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}"
+      spec:
+        replicas: 1
+        selector:
+          deploymentconfig: "{{ metadata.name }}"
+        strategy:
+          recreateParams:
+            timeoutSeconds: 600
+          type: Recreate
+        template:
+          metadata:
+            labels:
+              deploymentconfig: "{{ metadata.name }}"
+          spec:
+            containers:
+            - env:
+              - name: CONTEXT_PATH
+                value: /
+              image: ' '
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                exec:
+                  command:
+                  - echo
+                  - ok
+                failureThreshold: 3
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: "{{ metadata.name }}"
+              ports:
+              - containerPort: 8081
+                protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /
+                  port: 8081
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  memory: "{{ maxMemory }}"
+                requests:
+                  memory: 512Mi
+              terminationMessagePath: /dev/termination-log
+              volumeMounts:
+              - mountPath: /nexus-data
+                name: "{{ metadate.name }}-data" 
+            dnsPolicy: ClusterFirst
+            restartPolicy: Always
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+            volumes:
+            - name: "{{ metadata.name }}-data" 
+              persistentVolumeClaim:
+                claimName: "{{ metadata.name }}-pv"
+        test: false
+        triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+            - "{{ metadata.name }}"
+            from:
+              kind: ImageStreamTag
+              name: "{{ metadata.name }}:{{ nexusVersion }}"
+          type: ImageChange
+
+- name: Create image stream
+  k8s:
+    definition:
+      apiVersion: image.openshift.io/v1
+      kind: ImageStream
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}"
+      spec:
+        tags:
+        - from:
+            kind: DockerImage
+            name: registry.connect.redhat.com/sonatype/nexus-repository-manager: "{{ nexusVersion }}"
+          name: "{{ nexusVersion }}"
+
+- name: Create route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}"
+      spec:
+        port:
+          targetPort: 8081-tcp
+        to:
+          kind: Service
+          name: "{{ metadata.name }}"
+          weight: 100
+
+- name: Create service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        labels:
+          app: "{{ metadata.name }}"
+        name: "{{ metadata.name }}"
+      spec:
+        ports:
+        - name: 8081-tcp
+          port: 8081
+          protocol: TCP
+          targetPort: 8081
+        selector:
+          deploymentconfig: "{{ metadata.name }}"
+        sessionAffinity: None
+        type: ClusterIP
