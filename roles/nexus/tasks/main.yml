@@ -128,20 +128,5 @@
                 claimName: "{{ meta.name }}-pv"
         test: false
 
-- name: Create image stream
-  k8s:
-    definition:
-      apiVersion: image.openshift.io/v1
-      kind: ImageStream
-      metadata:
-        labels:
-          app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
-        namespace: "{{ meta.namespace }}"
-      spec:
-        tags:
-        - from:
-            kind: DockerImage
-            name: "registry.connect.redhat.com/sonatype/nexus-repository-manager:{{ nexusVersion }}"
-          name: "{{ nexusVersion }}"
+
 
