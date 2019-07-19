@@ -8,8 +8,8 @@
       kind: PersistentVolumeClaim
       metadata:
         labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}-pv"
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}-pv"
       spec:
         accessModes:
         - ReadWriteOnce
@@ -24,12 +24,12 @@
       kind: DeploymentConfig
       metadata:
         labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}"
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
       spec:
         replicas: 1
         selector:
-          deploymentconfig: "{{ metadata.name }}"
+          deploymentconfig: "{{ meta.name }}"
         strategy:
           recreateParams:
             timeoutSeconds: 600
@@ -37,7 +37,7 @@
         template:
           metadata:
             labels:
-              deploymentconfig: "{{ metadata.name }}"
+              deploymentconfig: "{{ meta.name }}"
           spec:
             containers:
             - env:
@@ -55,7 +55,7 @@
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 1
-              name: "{{ metadata.name }}"
+              name: "{{ meta.name }}"
               ports:
               - containerPort: 8081
                 protocol: TCP
@@ -77,25 +77,25 @@
               terminationMessagePath: /dev/termination-log
               volumeMounts:
               - mountPath: /nexus-data
-                name: "{{ metadate.name }}-data" 
+                name: "{{ meta.name }}-data" 
             dnsPolicy: ClusterFirst
             restartPolicy: Always
             securityContext: {}
             terminationGracePeriodSeconds: 30
             volumes:
-            - name: "{{ metadata.name }}-data" 
+            - name: "{{ meta.name }}-data" 
               persistentVolumeClaim:
-                claimName: "{{ metadata.name }}-pv"
+                claimName: "{{ meta.name }}-pv"
         test: false
         triggers:
         - type: ConfigChange
         - imageChangeParams:
             automatic: true
             containerNames:
-            - "{{ metadata.name }}"
+            - "{{ meta.name }}"
             from:
               kind: ImageStreamTag
-              name: "{{ metadata.name }}:{{ nexusVersion }}"
+              name: "{{ meta.name }}:{{ nexusVersion }}"
           type: ImageChange
 
 - name: Create image stream
@@ -105,8 +105,8 @@
       kind: ImageStream
       metadata:
         labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}"
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
       spec:
         tags:
         - from:
@@ -121,8 +121,8 @@
       kind: Service
       metadata:
         labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}"
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
       spec:
         ports:
         - name: 8081-tcp
@@ -130,7 +130,7 @@
           protocol: TCP
           targetPort: 8081
         selector:
-          deploymentconfig: "{{ metadata.name }}"
+          deploymentconfig: "{{ meta.name }}"
         sessionAffinity: None
         type: ClusterIP
 
@@ -141,13 +141,13 @@
       kind: Route
       metadata:
         labels:
-          app: "{{ metadata.name }}"
-        name: "{{ metadata.name }}"
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
       spec:
         port:
           targetPort: 8081-tcp
         to:
           kind: Service
-          name: "{{ metadata.name }}"
+          name: "{{ meta.name }}"
           weight: 100
 
