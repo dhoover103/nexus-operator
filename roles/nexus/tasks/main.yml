@@ -10,6 +10,7 @@
         labels:
           app: "{{ meta.name }}"
         name: "{{ meta.name }}-pv"
+        namespace: "{{ meta.namespace }}"
       spec:
         accessModes:
         - ReadWriteOnce
@@ -17,19 +18,57 @@
           requests:
             storage: "{{ volumeCapacity }}"
 
-- name: Create deployment
+- name: Create service
   k8s:
     definition:
-      apiVersion: apps.openshift.io/v1
-      kind: DeploymentConfig
+      apiVersion: v1
+      kind: Service
       metadata:
         labels:
           app: "{{ meta.name }}"
         name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
+      spec:
+        ports:
+        - name: 8081-tcp
+          port: 8081
+          protocol: TCP
+          targetPort: 8081
+        selector:
+          deploymentconfig: "{{ meta.name }}"
+        sessionAffinity: None
+        type: ClusterIP
+
+- name: Create ingress
+  k8s:
+    definition:
+      apiVersion: extensions/v1beta1
+      kind: Ingress
+      metadata:
+        labels:
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
+      spec:
+        backend:
+          serviceName: "{{ meta.name }}"
+          servicePort: 8081
+
+- name: Create deployment
+  k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        labels:
+          app: "{{ meta.name }}"
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
       spec:
         replicas: 1
         selector:
-          deploymentconfig: "{{ meta.name }}"
+          matchLabels:
+            app: "{{ meta.name }}"
         strategy:
           recreateParams:
             timeoutSeconds: 600
@@ -37,13 +76,14 @@
         template:
           metadata:
             labels:
-              deploymentconfig: "{{ meta.name }}"
+              matchLabels:
+                app: "{{ meta.name }}"
           spec:
             containers:
             - env:
               - name: CONTEXT_PATH
                 value: /
-              image: ' '
+              image: 'registry.connect.redhat.com/sonatype/nexus-repository-manager:3.16.0-01-rhel-2'
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 exec:
@@ -73,7 +113,7 @@
                 limits:
                   memory: "{{ maxMemory }}"
                 requests:
-                  memory: 512MiB
+                  memory: 512Mi
               terminationMessagePath: /dev/termination-log
               volumeMounts:
               - mountPath: /nexus-data
@@ -87,16 +127,6 @@
               persistentVolumeClaim:
                 claimName: "{{ meta.name }}-pv"
         test: false
-        triggers:
-        - type: ConfigChange
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-            - "{{ meta.name }}"
-            from:
-              kind: ImageStreamTag
-              name: "{{ meta.name }}:{{ nexusVersion }}"
-          type: ImageChange
 
 - name: Create image stream
   k8s:
@@ -107,47 +137,11 @@
         labels:
           app: "{{ meta.name }}"
         name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
       spec:
         tags:
         - from:
             kind: DockerImage
             name: "registry.connect.redhat.com/sonatype/nexus-repository-manager:{{ nexusVersion }}"
           name: "{{ nexusVersion }}"
-
-- name: Create service
-  k8s:
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        labels:
-          app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
-      spec:
-        ports:
-        - name: 8081-tcp
-          port: 8081
-          protocol: TCP
-          targetPort: 8081
-        selector:
-          deploymentconfig: "{{ meta.name }}"
-        sessionAffinity: None
-        type: ClusterIP
-
-- name: Create route
-  k8s:
-    definition:
-      apiVersion: route.openshift.io/v1
-      kind: Route
-      metadata:
-        labels:
-          app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
-      spec:
-        port:
-          targetPort: 8081-tcp
-        to:
-          kind: Service
-          name: "{{ meta.name }}"
-          weight: 100
 
