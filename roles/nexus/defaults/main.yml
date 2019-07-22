@@ -7,3 +7,5 @@ nexusVersion: latest
 volumeCapacity: 2Gi
 # Max memory allocated to the Nexus Repository Manager pod
 maxMemory: 1Gi
+size: 3
+hostname: "localhost.{{ meta.name }}"
