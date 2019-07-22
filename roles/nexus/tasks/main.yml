@@ -42,7 +42,7 @@
 - name: Create ingress
   k8s:
     definition:
-      apiVersion: extensions/v1
+      apiVersion: extensions/v1beta1
       kind: Ingress
       metadata:
         labels:
