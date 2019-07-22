@@ -51,7 +51,7 @@
           app: "{{ meta.name }}"
       spec:
         rules:
-        - host: "{{ hostname }}"
+        - host: 
           http:
             paths:
             - backend:
