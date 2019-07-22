@@ -67,7 +67,8 @@
       spec:
         replicas: 1
         selector:
-          app: "{{ meta.name }}"
+          matchLabels:
+            app: "{{ meta.name }}"
         strategy:
           recreateParams:
             timeoutSeconds: 600
@@ -75,8 +76,7 @@
         template:
           metadata:
             labels:
-              matchLabels:
-                app: "{{ meta.name }}"
+              app: "{{ meta.name }}"
           spec:
             containers:
             - env:
