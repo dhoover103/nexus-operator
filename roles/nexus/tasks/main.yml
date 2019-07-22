@@ -50,9 +50,13 @@
         labels:
           app: "{{ meta.name }}"
       spec:
-        backend:
-          serviceName: "{{ meta.name }}"
-          servicePort: 8081
+        rules:
+        - host: "{{ hostname }}"
+          http:
+            paths:
+              backend:
+                serviceName: "{{ meta.name }}"
+                servicePort: 8081
 
 - name: Create deployment
   k8s:
