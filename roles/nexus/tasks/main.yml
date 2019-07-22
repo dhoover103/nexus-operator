@@ -45,10 +45,10 @@
       apiVersion: extensions/v1beta1
       kind: Ingress
       metadata:
-        labels:
-          app: "{{ meta.name }}"
         name: "{{ meta.name }}"
         namespace: "{{ meta.namespace }}"
+        labels:
+          app: "{{ meta.name }}"
       spec:
         backend:
           serviceName: "{{ meta.name }}"
@@ -60,10 +60,10 @@
       apiVersion: apps/v1
       kind: Deployment
       metadata:
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"        
         labels:
           app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
-        namespace: "{{ meta.namespace }}"
       spec:
         replicas: 1
         selector:
