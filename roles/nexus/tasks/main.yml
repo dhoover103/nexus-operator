@@ -54,7 +54,7 @@
         - host: "{{ hostname }}"
           http:
             paths:
-              backend:
+            - backend:
                 serviceName: "{{ meta.name }}"
                 servicePort: 8081
 
