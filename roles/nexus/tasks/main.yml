@@ -72,7 +72,7 @@
         strategy:
           recreateParams:
             timeoutSeconds: 600
-          type: Recreate
+          type: RollingUpdate
         template:
           metadata:
             labels:
