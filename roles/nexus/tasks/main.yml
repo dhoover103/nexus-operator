@@ -46,7 +46,7 @@
       kind: Route
       metadata:
         name: "{{ meta.name }}"
-        #namespace: "{{ meta.namespace }}"
+        namespace: "{{ meta.namespace }}"
         labels:
           app: "{{ meta.name }}"
         name: "{{ meta.name }}"
