@@ -39,22 +39,24 @@
         sessionAffinity: None
         type: ClusterIP
 
-- name: Create route
+- name: Create ingress
   k8s:
     definition:
-      apiVersion: v1
-      kind: Route
+      apiVersion: extensions/v1beta1
+      kind: Ingress
       metadata:
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
         labels:
           app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
-        spec:
-          port:
-            targetPort: 8081-tcp
-          to:
-            kind: Service
-            name: "{{ meta.name }}"
-            weight: 100
+      spec:
+        rules:
+        - host: 
+          http:
+            paths:
+            - backend:
+                serviceName: "{{ meta.name }}"
+                servicePort: 8081
 
 - name: Create deployment
   k8s:
