@@ -25,8 +25,8 @@
       kind: Service
       metadata:
         labels:
-          app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
+          app: nexus
+        name: nexus
         namespace: "{{ meta.namespace }}"
       spec:
         ports:
@@ -35,27 +35,27 @@
           protocol: TCP
           targetPort: 8081
         selector:
-          deploymentconfig: "{{ meta.name }}"
+          deploymentconfig: nexus
         sessionAffinity: None
         type: ClusterIP
 
-- name: Create route
+- name: Create Route
   k8s:
     definition:
       apiVersion: v1
       kind: Route
       metadata:
-        name: "{{ meta.name }}"
-        namespace: "{{ meta.namespace }}"
         labels:
-          app: "{{ meta.name }}"
-        spec:
-          port: 
-            targetPort: 8081-tcp
-          to:
-            kind: Service
-            name: "{{ meta.name }}"
-            weight: 100
+          app: nexus
+        name: nexus
+        namespace: "{{ meta.namespace }}"
+      spec:
+        port:
+          targetPort: 8081-tcp
+        to:
+          kind: Service
+          name: nexus
+          weight: 100
 
 - name: Create deployment
   k8s:
