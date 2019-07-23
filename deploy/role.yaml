@@ -47,8 +47,8 @@ rules:
   verbs:
   - '*'
 - apiGroups:
-  - route.openshift.io
+  - extensions
   resources:
-  - routes
+  - ingresses
   verbs:
   - '*'
