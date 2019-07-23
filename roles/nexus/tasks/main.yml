@@ -49,7 +49,6 @@
         namespace: "{{ meta.namespace }}"
         labels:
           app: "{{ meta.name }}"
-        name: "{{ meta.name }}"
         spec:
           port: 
             targetPort: 8081-tcp
