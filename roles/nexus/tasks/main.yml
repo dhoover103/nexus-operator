@@ -8,7 +8,7 @@
       kind: PersistentVolumeClaim
       metadata:
         labels:
-          app: "{{ meta.name }}"
+          app: nexus
         name: "{{ meta.name }}-pv"
         namespace: "{{ meta.namespace }}"
       spec:
@@ -63,15 +63,15 @@
       apiVersion: apps/v1
       kind: Deployment
       metadata:
-        name: "{{ meta.name }}"
+        name: nexus
         namespace: "{{ meta.namespace }}"        
         labels:
-          app: "{{ meta.name }}"
+          app: nexus
       spec:
         replicas: 1
-        #selector:
-          #matchLabels:
-            #app: "{{ meta.name }}"
+        selector:
+          matchLabels:
+            app: nexus
         strategy:
           recreateParams:
             timeoutSeconds: 600
@@ -79,7 +79,7 @@
         template:
           metadata:
             labels:
-              app: "{{ meta.name }}"
+              app: nexus
           spec:
             containers:
             - env:
@@ -97,7 +97,7 @@
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 1
-              name: "{{ meta.name }}"
+              name: nexus
               ports:
               - containerPort: 8081
                 protocol: TCP
@@ -129,6 +129,4 @@
               persistentVolumeClaim:
                 claimName: "{{ meta.name }}-pv"
         test: false
-
-
 
