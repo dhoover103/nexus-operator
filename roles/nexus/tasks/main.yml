@@ -86,7 +86,7 @@
             - env:
               - name: CONTEXT_PATH
                 value: /
-              image: 'registry.connect.redhat.com/sonatype/nexus-repository-manager:{{ version }}'
+              image: 'registry.connect.redhat.com/sonatype/nexus-repository-manager:{{ nexusVersion }}'
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 exec:
