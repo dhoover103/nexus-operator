@@ -14,7 +14,6 @@ rules:
   - events
   - configmaps
   - secrets
-  - routes
   verbs:
   - '*'
 - apiGroups:
@@ -48,8 +47,8 @@ rules:
   verbs:
   - '*'
 - apiGroups:
-  - extensions
+  - route.openshift.io
   resources:
-  - ingresses
+  - routes
   verbs:
   - '*'
