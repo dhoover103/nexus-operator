@@ -146,5 +146,5 @@ spec:
     - name: RHSCL
       email: RHSCL@example.com
   provider: 
-    - name: Red Hat Software Collections
+    - name: placeholder
   version: 0.0.1
