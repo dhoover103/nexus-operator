@@ -35,7 +35,7 @@
           protocol: TCP
           targetPort: 8081
         selector:
-          deploymentconfig: nexus
+          app: nexus
         sessionAffinity: None
         type: ClusterIP
 
