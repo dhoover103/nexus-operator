@@ -1,4 +1,4 @@
-FROM quay.io/operator-framework/ansible-operator:v0.8.2
+FROM quay.io/operator-framework/ansible-operator:master
 
 ### Required OpenShift Labels
 LABEL name="Nexus Operator" \
