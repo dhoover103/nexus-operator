@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[{"apiVersion":"repomgr.sonatype.com/v1alpha1","kind":"Nexus","metadata":{"name":"nexus-operator"},"spec":{"maxMemory":"1Gi","nexusVersion":"3.16.0-01-rhel-2","size":3,"volumeCapacity":"2Gi"}}]'
     capabilities: Basic Install
-    catagories: "Database"
+    categories: "Integration & Delivery"
     description: Description of the nexus repository manager
     containerImage: quay.io/dhoover103/repomgr-operator
     createdAt: 2019-07-24T14:03:24Z
@@ -137,8 +137,7 @@ spec:
   - supported: true
     type: AllNamespaces
   maturity: alpha
-  keywords:
-    - repo
+  keywords: ['repository manager']
   links:
     - name: placeholder
       url: http://sonatype.example.operator.com/
@@ -146,5 +145,5 @@ spec:
     - name: RHSCL
       email: RHSCL@example.com
   provider: 
-    - name: placeholder
+    name: placeholder
   version: 0.0.1
