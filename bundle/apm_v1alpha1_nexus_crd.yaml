@@ -12,7 +12,7 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
-  version: v0.0.1
+  version: v1alpha1
   versions:
   - name: v0.0.1
     served: true
